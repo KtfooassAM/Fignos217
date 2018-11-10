@@ -229,18 +229,18 @@ class SettingsWidget(QWidget):
 
         pwd_lb = QLabel("Mot de passe :")
         self.pwd_le = QLineEdit()
-        self.pwd_le.activated[str].connect(lambda:pass)
+        self.pwd_le.activated[str].connect(lambda x:x)
 
         main_layout.addRow(pwd_lb, pwd_le)
 
         size_lb = QLabel("Taille de la police :")
         self.size_le = QLineEdit()
-        self.size_le.textChanged.connect(lambda:pass)
+        self.size_le.textChanged.connect(lambda x:x)
 
         main_layout.addRow(size_lb, self.size_le)
 
         button = QPushButton("Valider")
-        button.clicked.connect(lambda:pass)
+        button.clicked.connect(lambda x:x)
 
         main_layout.addRow(button)
 
