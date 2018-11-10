@@ -26,9 +26,17 @@ Une fois les fichiers présents sur votre ordinateur, lancez le programme qui vo
 
 Ce logiciel est actuellement en version 0.0.1.
 
+## TO-DO List
+- Remapper les signaux des QDialog du menu Editer (notemment connectionDialog)
+- Menu Editer/Preferences : modifier la police/taille et d'autres aspects des widgets protégé par mdp
+- Inferface CdF : histogramme des restocks de champ's de chaque bar.
+- Chat plus lisible, une couleur par bar, messages importants restent plus longtemps en évidence
+- Modifier l'organisation des bdd
+- Trouver les bugs et débugger (ébid'ss)
+
 ## Auteurs
 
-Ce logiciel a été développé par l'équipe des T\&lek'ss de Bordel'ss (216 et 217).
+Ce logiciel a été développé par l'équipe des T\&lek'ss de Bordel'ss (216/217/..8).
 
 ## Thuys git
 
@@ -43,7 +51,7 @@ Placez vous dans le dossier parent de celui où vous souhaitez travailler :
     * Exemple : `cd mes-projets` ou `cd /home/mon-compte/mes-projets`
 
 Clonez le dépôt :
-* `git clone https://github.com/KtfooassAM/Fignos217`
+* `git clone https://github.com/KtfooassAM/Fignos217.git`
 
 ### Push
 
@@ -54,7 +62,7 @@ Ajoutez les fichiers que vous souhaitez sauvegarder :
     * Exemples : `git add .` ou `git add *.py`
 
 Ajoutez les informations de modification :
-* `git commit`
+* `git commit -m "__message__"`
 
 Publiez les modificationsque vous avez effectuées :
 * `git push origin dev`

@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import *  # qApp, QMainWindow, QWidget, QHBoxLayout, QActio
 
 from chatPanel import ChatPanel
 from connectionDialog import ConnectionDialog
+from preferencesDialog_v2 import PreferencesDialog
+from informationDialog import InformationDialog
 from locations import Locations
 from ordersPanel import OrdersPanel
 from preferencesDialog_v2 import PreferencesDialog
@@ -103,7 +105,7 @@ class Window(QMainWindow):
         # Adding exit option
         exit_act = QAction("&Quitter", self)
         exit_act.setStatusTip("Quitter l'application")
-        exit_act.setShortcut("Ctrl+Q")
+        #exit_act.setShortcut("Ctrl+Q")
         exit_act.triggered.connect(self.close)
 
         file_menu.addAction(exit_act)
@@ -113,17 +115,24 @@ class Window(QMainWindow):
 
         pref_act = QAction("&Préférences", self)
         pref_act.setStatusTip("Ouvrir le menu des préférences")
-        pref_act.setShortcut("Ctrl+P")
+        #pref_act.setShortcut("Ctrl+P")
         pref_act.triggered.connect(lambda: self.__show_settings_dialog(location))
 
         edit_menu.addAction(pref_act)
 
         conn_act = QAction("&Connexion", self)
-        conn_act.setStatusTip("Ouvrir les informations de connexion")
-        conn_act.setShortcut("Ctrl+I")
+        conn_act.setStatusTip("Ouvrir le menu de connexion")
+        #conn_act.setShortcut("Ctrl+C")
         conn_act.triggered.connect(lambda: self.__show_connection_dialog(location))
 
         edit_menu.addAction(conn_act)
+        
+        infco_act = QAction("&Informations", self)
+        infco_act.setStatusTip("Ouvrir les informations de connexion")
+        #infco_act.setShortcut("Ctrl+I")
+        infco_act.triggered.connect(self.__show_information_dialog)
+
+        edit_menu.addAction(infco_act)
 
         # Adding 'Aide' sub-menu
         help_menu = menubar.addMenu("&Aide")
@@ -231,21 +240,29 @@ class Window(QMainWindow):
         # Emit the export signal
         self.export_db.emit(name)
 
-    def __show_connection_dialog(self, location):
+    def __show_preferences_dialog(self, location):
+        preferences = PreferencesDialog(location)
+
+        # Executing
+        preferences.exec_()
+        
+    
+    def __show_information_dialog(self):
         """Method used to display all the information related to connections"""
 
         # It is no good practice but I don't have time to correct that
         def test(x):
-            d = ConnectionDialog(x)
+            d = InformationDialog(x)
             d.exec_()
 
         self.__app.open_connection_dialog.connect(test)
         self.request_connection_infos.emit()
-
-    def __show_settings_dialog(self, location):
+        
+    def __show_connection_dialog(self, location):
         """Method used to setup the app."""
-
-        preferences = PreferencesDialog(location)
+        # Renommer tous les signaux preferences par connection
+        
+        preferences = ConnectionDialog(location)
         # Handling connection signals
         self.__app.fill_preferences.connect(preferences.fill_values)
         self.ask_preferences.emit()
@@ -387,26 +404,3 @@ class Window(QMainWindow):
     def __add_restal_order(self, bar, food, quantity):
         """Method called to add a new order for the restal."""
         self.main_widget.add_order(bar, food, quantity)
-
-
-if __name__ == '__main__':
-    # Importing modules used to run the app
-    from PyQt5.QtWidgets import QApplication
-    import sys
-
-    # Instantiating the objects
-    app = QApplication(sys.argv)
-
-    file = QFile("style.qss")
-    file.open(QFile.ReadOnly | QFile.Text)
-    stream = QTextStream(file)
-    app.setStyleSheet(stream.readAll())
-    
-    window = Window(app, Locations.BAR)
-
-    # Populating test data
-    # for i in range(60):
-    # window.orders_panel.add_order_widget((str(i), i%3+1, "1"))
-
-    # Launching the app
-    sys.exit(app.exec_())
