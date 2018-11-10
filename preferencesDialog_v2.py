@@ -9,17 +9,15 @@ from locations import Locations
 class PreferencesDialog(QDialog):
     """Class defining the preferences dialog window."""
 
-    def __init__(self, location):
+    def __init__(self):
         """Constructor. This class must be executed directly by calling this.exec_()."""
         QDialog.__init__(self)
 
-        self.location = location
-
         # Initializing the UI
-        self.__initUI(location)
+        self.__initUI()
 
 
-    def __initUI(self, location):
+    def __initUI(self):
         """Method creating the UI for this window."""
 
         # Setting title
@@ -42,18 +40,18 @@ class PreferencesDialog(QDialog):
         self.setLayout(main_layout)
 
 
-class PwdWidget():
+class PwdWidget(QWidget):
     """Class defining a widget containing the fields necessary for the passsword verification"""
 
-    def __init__(self, location):
+    def __init__(self):
         """Constructor."""
         QWidget.__init__(self)
 
         self.ip = ""
 
-        self.__initUI(location)
+        self.__initUI()
 
-    def __initUI(self, location):
+    def __initUI(self):
         """Method used to build the UI of the widget."""
 
         frame = QFrame(self)
@@ -78,16 +76,16 @@ class PwdWidget():
         layout.addWidget(frame)
         self.setLayout(layout)
 
-class PreferenceWidget():
-    def __init__(self, location):
+class PreferencesWidget(QWidget):
+    def __init__(self):
         """Constructor."""
         QWidget.__init__(self)
 
         self.ip = ""
 
-        self.__initUI(location)
+        self.__initUI()
 
-    def __initUI(self, location):
+    def __initUI(self):
         """Method used to build the UI of the widget."""
 
         frame = QFrame(self)
@@ -98,7 +96,7 @@ class PreferenceWidget():
 
         size_lb = QLabel("Taille de police :")
 
-        list_size = [i for i in range(6,50)]
+        list_size = [str(i) for i in range(6,50)]
         
         self.size_combo = QComboBox(self)        
         self.size_combo.addItems(list_size)

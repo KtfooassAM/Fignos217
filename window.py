@@ -116,7 +116,7 @@ class Window(QMainWindow):
         pref_act = QAction("&Préférences", self)
         pref_act.setStatusTip("Ouvrir le menu des préférences")
         #pref_act.setShortcut("Ctrl+P")
-        pref_act.triggered.connect(lambda: self.__show_settings_dialog(location))
+        pref_act.triggered.connect(self.__show_preferences_dialog)
 
         edit_menu.addAction(pref_act)
 
@@ -240,8 +240,8 @@ class Window(QMainWindow):
         # Emit the export signal
         self.export_db.emit(name)
 
-    def __show_preferences_dialog(self, location):
-        preferences = PreferencesDialog(location)
+    def __show_preferences_dialog(self):
+        preferences = PreferencesDialog()
 
         # Executing
         preferences.exec_()
