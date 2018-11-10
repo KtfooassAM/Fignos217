@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayo
 from locations import Locations
 
 
-class ConnectionDialog(QDialog):
+class InformationDialog(QDialog):
     """Class defining the connection dialog window."""
 
     def __init__(self, device_list):
@@ -68,24 +68,3 @@ class LedIndicator(QPushButton):
             icon = "SP_DialogNoButton"
 
         self.setIcon(self.style().standardIcon(getattr(QStyle, icon)))
-
-
-if __name__ == "__main__":
-    # Importing modules used to run the app
-    from PyQt5.QtWidgets import QApplication
-    import sys
-
-    # Instantiating the objects
-    app = QApplication(sys.argv)
-
-    devices_list = []
-    for i in range(4):
-        devices_list.append(("Bar {}".format(i), i % 2))
-
-    widget = ConnectionDialog(devices_list)
-
-    # Showing
-    widget.show()
-
-    # Launching the app
-    sys.exit(app.exec_())

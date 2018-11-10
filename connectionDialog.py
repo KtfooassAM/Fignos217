@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QWidget, QFrame, QSizePolicy, 
 
 from locations import Locations
 
-class PreferencesDialog(QDialog):
+class ConnectionDialog(QDialog):
     """Class defining the preferences dialog window."""
 
     barParameters = pyqtSignal(str)
