@@ -28,7 +28,7 @@ Ce logiciel est actuellement en version 0.0.1.
 
 ## Auteurs
 
-Ce logiciel a été développé par l'équipe des T\&lek'ss de Bordel'ss (216 et .17).
+Ce logiciel a été développé par l'équipe des T\&lek'ss de Bordel'ss (216 et 217).
 
 ## Thuys git
 
@@ -43,7 +43,7 @@ Placez vous dans le dossier parent de celui où vous souhaitez travailler :
     * Exemple : `cd mes-projets` ou `cd /home/mon-compte/mes-projets`
 
 Clonez le dépôt :
-* `git clone git@gitlab.com:telek_s/fignos.git`
+* `git clone https://github.com/KtfooassAM/Fignos217`
 
 ### Push
 
