@@ -103,7 +103,7 @@ class Window(QMainWindow):
         # Adding exit option
         exit_act = QAction("&Quitter", self)
         exit_act.setStatusTip("Quitter l'application")
-        exit_act.setShortcut("Ctrl+Q")
+        #exit_act.setShortcut("Ctrl+Q")
         exit_act.triggered.connect(self.close)
 
         file_menu.addAction(exit_act)
@@ -113,17 +113,24 @@ class Window(QMainWindow):
 
         pref_act = QAction("&Préférences", self)
         pref_act.setStatusTip("Ouvrir le menu des préférences")
-        pref_act.setShortcut("Ctrl+P")
+        #pref_act.setShortcut("Ctrl+P")
         pref_act.triggered.connect(lambda: self.__show_settings_dialog(location))
 
         edit_menu.addAction(pref_act)
 
         conn_act = QAction("&Connexion", self)
-        conn_act.setStatusTip("Ouvrir les informations de connexion")
-        conn_act.setShortcut("Ctrl+I")
+        conn_act.setStatusTip("Ouvrir le menu de connexion")
+        #conn_act.setShortcut("Ctrl+C")
         conn_act.triggered.connect(lambda: self.__show_connection_dialog(location))
 
         edit_menu.addAction(conn_act)
+        
+        infco_act = QAction("&Informations", self)
+        infco_act.setStatusTip("Ouvrir les informations de connexion")
+        #infco_act.setShortcut("Ctrl+I")
+        infco_act.triggered.connect(lambda: self.__show_connection_dialog(location))
+
+        edit_menu.addAction(infco_act)
 
         # Adding 'Aide' sub-menu
         help_menu = menubar.addMenu("&Aide")
