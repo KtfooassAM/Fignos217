@@ -96,7 +96,13 @@ class PreferencesWidget(QWidget):
 
     def __initUI(self):
         """Method used to build the UI of the widget."""
-
+        self.background_color = ""
+        self.font_color = ""
+        with open("style.qss","r") as f:
+            lines = f.readlines()
+            self.background_color = lines[10][23:-2:]
+            self.font_color = lines[9][12:-2:]
+            
         frame = QFrame(self)
         frame.setFrameShape(QFrame.StyledPanel)
         frame.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -121,21 +127,21 @@ class PreferencesWidget(QWidget):
 
         self.font_combo = QComboBox(self)
         self.font_combo.addItems(list_font)
-
+        ##setCurrentIndex
         main_layout.addRow(font_lb, self.font_combo)
 
         bold_checkBox = QCheckBox("Bold", self)
 
         main_layout.addRow(bold_checkBox)
         
-##        button_color_font = QPushButton("Color font", self)
-##        button_color_font.clicked.connect(self.showDialog)
-##
-##        button_color_background = QPushButton("Color background", self)
-##        button_color_background.clicked.connect(self.showDialog)
-##
-##        main_layout.addRow(button_color_font, button_color_background)
-##
+        button_color_font = QPushButton("Color font", self)
+        button_color_font.clicked.connect(lambda : self.showDialog("font"))
+
+        button_color_background = QPushButton("Color background", self)
+        button_color_background.clicked.connect(lambda : self.showDialog("back"))
+
+        main_layout.addRow(button_color_font, button_color_background)
+
         
 
         button = QPushButton("Appliquer")
@@ -156,15 +162,26 @@ class PreferencesWidget(QWidget):
                     lines[17] = "\tfont: bold {0}pt {1};\n".format(text_size,text_font)
                 else:
                     lines[17] = "\tfont: {0}pt {1};\n".format(text_size,text_font)
+                lines[9] = "    color: #{0};\n".format(self.font_color)
+                lines[10] = "    background-color: #{0};\n".format(self.background_color)
                 with open("style.qss","w") as f2:
                     for x in lines:
                         f2.write(x)
 
-##    def showDialog(self):
-##        col = QColorDialog.getColor()
-##        if col.isValid():
-##            col.rgb()
+    def showDialog(self,info):
+        col = QColorDialog.getColor()
+        if col.isValid():
+            if info == "font":
+                self.font_color = hex(col.rgb())[2::]
+            elif info == "back":
+                self.background_color = hex(col.rgb())[2::]
             
-                
-                
-            
+##            with open("style.qss","r") as f:
+##                lines = f.readlines()
+##                if info == "font":
+##                    lines[9] = "    color: #{0};\n".format(hex(col.rgb())[2::])
+##                elif info == "back":
+##                    lines[10] = "    background-color: #{0};\n".format(hex(col.rgb())[2::])
+##            with open("style.qss","w") as f:
+##                for x in lines:
+##                    f.write(x)
