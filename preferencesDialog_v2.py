@@ -80,6 +80,7 @@ class PwdWidget(QWidget):
         self.setLayout(layout)
 
     def pwdCheck(self,parent):
+        """Check password from password.txt"""
         with open("password.txt","r") as f:
             password = f.readline()
             if password == self.pwd_le.text():
@@ -100,8 +101,21 @@ class PreferencesWidget(QWidget):
         self.font_color = ""
         with open("style.qss","r") as f:
             lines = f.readlines()
+            
             self.background_color = lines[10][23:-2:]
             self.font_color = lines[9][12:-2:]
+            self.font_line = lines[17]
+            
+            if "bold" in self.font_line:
+                self.current_fontSize = self.font_line.split(":")[1].split(" ")[2].split("pt")[0]
+                self.current_font = self.font_line.split(":")[1].split(" ")[3].split(";")[0]
+                self.isBold = True
+            else:
+                self.current_fontSize = self.font_line.split(":")[1].split(" ")[1].split("pt")[0]
+                self.current_font = self.font_line.split(":")[1].split(" ")[2].split(";")[0]
+                self.isBold = False
+            
+            self.current_font = self.current_font.capitalize()
             
         frame = QFrame(self)
         frame.setFrameShape(QFrame.StyledPanel)
@@ -115,6 +129,9 @@ class PreferencesWidget(QWidget):
         
         self.size_combo = QComboBox(self)        
         self.size_combo.addItems(list_size)
+
+        self.index = self.size_combo.findText(str(self.current_fontSize))
+        self.size_combo.setCurrentIndex(self.index)
         
         main_layout.addRow(size_lb, self.size_combo)
 
@@ -127,10 +144,16 @@ class PreferencesWidget(QWidget):
 
         self.font_combo = QComboBox(self)
         self.font_combo.addItems(list_font)
-        ##setCurrentIndex
+
+        self.index = self.font_combo.findText(str(self.current_font))
+        self.font_combo.setCurrentIndex(self.index)
+
         main_layout.addRow(font_lb, self.font_combo)
 
         bold_checkBox = QCheckBox("Bold", self)
+
+        if self.isBold:
+            bold_checkBox.setChecked(True)
 
         main_layout.addRow(bold_checkBox)
         
@@ -142,12 +165,13 @@ class PreferencesWidget(QWidget):
 
         main_layout.addRow(button_color_font, button_color_background)
 
-        
-
         button = QPushButton("Appliquer")
-        button.clicked.connect(lambda: write(self, self.size_combo.currentText() ,self.font_combo.currentText(), bold_checkBox.isTristate))
-        
-        main_layout.addRow(button)
+        button.clicked.connect(lambda: write(self, self.size_combo.currentText() ,self.font_combo.currentText(), bold_checkBox.isChecked()))
+
+        button_reset = QPushButton("Reset")
+        button_reset.clicked.connect(lambda :  self.reset())
+
+        main_layout.addRow(button,button_reset)
 
         frame.setLayout(main_layout)
         
@@ -156,6 +180,8 @@ class PreferencesWidget(QWidget):
         self.setLayout(layout)
 
         def write(self, text_size, text_font, bool_bold):
+            """Write style info to style.qss"""
+            print(bool_bold)
             with open("stylebu.qss","r") as f:
                 lines = f.readlines()
                 if bool_bold:
@@ -168,7 +194,17 @@ class PreferencesWidget(QWidget):
                     for x in lines:
                         f2.write(x)
 
+    def reset(self):
+        """Reset style.qss from stylebu.qss"""
+        with open("stylebu.qss","r") as f:
+            lines = f.readlines()
+            with open("style.qss","w") as f2:
+                for x in lines:
+                    f2.write(x)
+
+                        
     def showDialog(self,info):
+        """Show a dialog window to choose a color"""
         col = QColorDialog.getColor()
         if col.isValid():
             if info == "font":

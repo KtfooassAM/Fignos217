@@ -311,7 +311,7 @@ class Window(QMainWindow):
 
         box = QMessageBox()
         box.setIcon(QMessageBox.Information)
-        box.setText("    Usiné par les T&lek's 216 et 217    ")
+        box.setText("    Usiné par les T&lek's 216 et 217 et .18   ")
         box.setInformativeText(message)
         box.setWindowTitle("À propos")
         box.exec_()
