@@ -2,6 +2,7 @@
 
 from PyQt5.QtCore import QTime, Qt, pyqtSignal
 from PyQt5.QtWidgets import *
+from random import randint
 
 from verticalScroll import VerticalScroll
 
@@ -29,12 +30,15 @@ class ChatPanel(QWidget):
         # Creating of the main layout of the chat
         main_layout = QVBoxLayout()
 
-        # Creating the vertical scroll area to display messages
-        self.scroll = VerticalScroll(top_stretch=True)
+        # Creating the message list (Important)
+        message_list_important = VerticalScroll(top_stretch=True)
 
+        # Creating tje message list (General)
+        self.message_list_general = VerticalScroll(top_stretch=True)
+        
         # Creating the layout to send messages
         new_message_layout = QHBoxLayout()
-
+                
         # Creating field to compose messages
         self.new_message_entry = QLineEdit('', self)
         self.new_message_entry.setPlaceholderText("Entrez votre message ici :")
@@ -43,14 +47,21 @@ class ChatPanel(QWidget):
         send_message_button = QPushButton("Envoyer", self)
         send_message_button.clicked.connect(self.__send_message)
 
+        # Creating the 'urgent' button
+        send_message_button_urgent = QPushButton("Urgent", self)
+        send_message_button_urgent.clicked.connect(self.__send_message)
+
         # Adding the widgets to the bottom layout
         new_message_layout.addWidget(self.new_message_entry)
         new_message_layout.addWidget(send_message_button)
+        new_message_layout.addWidget(send_message_button_urgent)
 
         # Adding everything to the main layout
         main_layout.addWidget(QLabel("Discussion"))
-        main_layout.addWidget(self.scroll)
+        main_layout.addWidget(message_list_important,stretch = 1)
+        main_layout.addWidget(self.message_list_general, stretch = 2)
         main_layout.addLayout(new_message_layout)
+   
 
         # Ajout du widget principal au chat
         self.setLayout(main_layout)
@@ -68,56 +79,71 @@ class ChatPanel(QWidget):
             # Clearing the entry for another message to be sent
             self.new_message_entry.clear()
 
+            # Test
+
     def keyPressEvent(self, event):
         """Method handling the key press events."""
 
         # Key pressed was Enter (both of them) : sending the message
         if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
             self.__send_message()
+            
+    def add_message(self,msg):
+        """Method to add message to the list"""
+        # Revoir les formats des messages
+        print(msg)
+        if len(msg) == 2:
+            wid = MessageWidget(msg[0],msg[1])
+        elif len(msg) == 1:
+            wid = MessageWidget(msg[0],"Inconnu")
+        wid.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.message_list_general.add_widget(wid)
 
-    def add_message(self, infos):
-        """Method called to add a message to the list."""
-        # Rewriting message
-        if len(infos) == 2:  # With author
-            message = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)[:-6] + ' - ' + infos[1].capitalize() + ' : ' + infos[0]
-        elif len(infos) == 1:
-            message = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)[:-6] + ' - ' + infos[0]
-        else:
-            message = "### ERROR ###"
-        # Adding the message to the vertical scroll
-        label = QLabel(message)
-        if len(infos) == 2:  # With author
-            if self.place_name == infos[1]:
-                label.setStyleSheet('color: black')
-            else:
-                label.setStyleSheet('color: red')
-        self.scroll.add_widget(label)
+        # Putting the VerticalScroll downest as possible
+        # self.scroll.verticalScrollBar().setValue(self.scroll.verticalScrollBar().maximum())
 
-        # Scrolling to the bottom (to the last label added)
-        # print(self.scroll.verticalScrollBar().maximum())
-        self.scroll.verticalScrollBar().setValue(self.scroll.verticalScrollBar().maximum())
+class MessageWidget(QWidget):
 
+    def __init__(self,msg,src):
+
+        QWidget.__init__(self)
+
+        self.message = msg
+        self.source = src
+        self.hour = QTime.currentTime().toString()
+
+        self.dico_color = {'Vinci':"QLabel {color:#8e2562}",
+                           'Bar 2':"QLabel {color:#f29400}",
+                           'Bar 3':"QLabel {color:#55bf35}",
+                           'Bar 4':"QLabel {color:#0000ff}",
+                           'Bar 5':"QLabel {color:#bf3547}",
+                           'Reserve':"QLabel {color:orange}",
+                           'CDF':"QLabel {background-color:pink}",
+                           'Inconnu':"QLabel {color:#ffffff}"}
+
+        self.__init_UI()
+
+    def __init_UI(self):
+        
+        message_layout = QHBoxLayout()
+
+        hour_slot = QLabel(self.hour)
+        sender_name = QLabel(self.source + " :")
+        if self.source in self.dico_color:
+            sender_name.setStyleSheet(self.dico_color[self.source])
+
+        
+        message_slot = QLabel(self.message)
+        
+        message_layout.addWidget(hour_slot,stretch=1)
+        message_layout.addWidget(sender_name,stretch=1)
+        message_layout.addWidget(message_slot,stretch=3)
+        self.setLayout(message_layout) 
+        
 
 if __name__ == '__main__':
-    # Importing modules used to run the app
-    from PyQt5.QtWidgets import QApplication
     import sys
-
-    # Instantiating the objects
     app = QApplication(sys.argv)
-
-    chat_panel = ChatPanel()
-    chat_panel.show()
-
-    # Launching the app
+    Msg = ChatPanel()
+    Msg.show()
     sys.exit(app.exec_())
-
-# TO-DO:
-#     Add reception of messages
-#     Add sending of messages through socket
-#     Prevent the chat to get the cursor by default
-#     Clarify architecture : too many items (layout and widgets)
-#     Add scrollabel object to simplify architecture
-
-# BUGS
-#	Scrolling to bottom doesn't work completely : one element missing

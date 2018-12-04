@@ -15,7 +15,7 @@ QWidget {
     border-image: none;
     border: 0px transparent black;
     outline: 0;
-	font: bold 16pt Zagots;
+	font: 15pt arial;
 }
 
 QWidget:item:hover {
@@ -126,7 +126,6 @@ QRadioButton::indicator:unchecked:disabled {
 }
 
 QMenuBar {
-    background-color: #31363b;
     color: #eff0f1;
 }
 

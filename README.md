@@ -28,15 +28,13 @@ Ce logiciel est actuellement en version 0.0.1.
 
 ## TO-DO List
 - Remapper les signaux des QDialog du menu Editer (notemment connectionDialog)
-- Menu Editer/Preferences : modifier la police/taille et d'autres aspects des widgets protégé par mdp
-- Inferface CdF : histogramme des restocks de champ's de chaque bar.
-- Chat plus lisible, une couleur par bar, messages importants restent plus longtemps en évidence
-- Modifier l'organisation des bdd
+- Supprimer la liste des bars à la connection
+- Changer histogramme des stocks par consommation
 - Trouver les bugs et débugger (ébid'ss)
 
 ## Auteurs
 
-Ce logiciel a été développé par l'équipe des T\&lek'ss de Bordel'ss (216/217/..8).
+Ce logiciel a été développé par l'équipe des T\&lek'ss de Bordel'ss (216/217/.18).
 
 ## Thuys git
 

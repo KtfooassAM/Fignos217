@@ -44,17 +44,17 @@ class Window(QMainWindow):
         self.__init_UI(location)
 
         # Connecting signals
-##        app.message_received.connect(self.chat_panel.add_message)
-##        self.chat_panel.send_message.connect(self.send_message)
-##        if location == Locations.BAR:
-##            self.main_widget.order_drink.connect(self.order_drink)
-##            self.__app.refuelling_in_progress.connect(self.add_refuel_notif)
-##            self.main_widget.refuel_completed.connect(self.confirm_refuel_complete)
-##        elif location == Locations.RESERVE:
-##            self.__app.request_refuel.connect(self.main_widget.update_prevision_widget)
-##            self.main_widget.sending_refuel.connect(self.sending_refuel)
-##        elif location == Locations.RESTAL:
-##            self.__app.add_order.connect(self.__add_restal_order)
+        app.message_received.connect(self.chat_panel.add_message)
+        self.chat_panel.send_message.connect(self.send_message)
+        if location == Locations.BAR:
+            self.main_widget.order_drink.connect(self.order_drink)
+            self.__app.refuelling_in_progress.connect(self.add_refuel_notif)
+            self.main_widget.refuel_completed.connect(self.confirm_refuel_complete)
+        elif location == Locations.RESERVE:
+            self.__app.request_refuel.connect(self.main_widget.update_prevision_widget)
+            self.main_widget.sending_refuel.connect(self.sending_refuel)
+        elif location == Locations.RESTAL:
+            self.__app.add_order.connect(self.__add_restal_order)
 
     def __init_UI(self, location):
         """Method used to initialize the interface of the window."""
@@ -183,6 +183,14 @@ class Window(QMainWindow):
             from restalWidget import RestalWidget
             self.main_widget = RestalWidget()
             layout.addWidget(self.main_widget, stretch = 1)
+
+        elif location is Locations.CDF:
+
+            from cdfWidget import cdfWidget
+            self.main_widget = cdfWidget()
+            self.__app.send_champagne_cdf.connect(self.main_widget.setValues)
+            layout.addWidget(self.main_widget, stretch = 3)
+            #self.cdfWidget.setValues.connect
 
         else:  # If place is CDF or Unknown
             pass

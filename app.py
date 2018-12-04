@@ -15,6 +15,8 @@ class App(QObject):
     name_set = pyqtSignal()
     fill_preferences = pyqtSignal(tuple, str)
     open_connection_dialog = pyqtSignal(list)
+    send_champagne_cdf = pyqtSignal(list)
+    
 
     message_received = pyqtSignal(tuple)
 

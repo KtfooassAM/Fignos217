@@ -8,7 +8,6 @@ from window import Window, Locations
 
 HOST, PORT = 'localhost', 3000
 
-
 class CDFApp(App):
     """Class defining all methods necessary to the CDF app."""
 
@@ -20,9 +19,9 @@ class CDFApp(App):
         self.__tcpSocket = QTcpSocket()
 
         self.__name = ""
-
-        App.__init__(self)  # Used at the end because it launches the app
-
+        
+        super().__init__()  # Used at the end because it launches the app
+        
     def _open_window(self):
         """Method replacing the App one's to launch the user interface."""
         # Creating the window
@@ -48,7 +47,8 @@ class CDFApp(App):
         self._window.ask_preferences.connect(
             lambda: self.fill_preferences.emit((self.__tcpSocket.peerAddress().toString(), self.__tcpSocket.peerPort()),
                                                self.__name))
-
+        
+       
         # Connecting the send message signal
         self._window.send_message.connect(lambda x: self.encode_message(action="ME", message=x))
 
@@ -160,6 +160,11 @@ class CDFApp(App):
 
             pass
 
+        elif  message_split[0] == "CH":
+
+            exec("data = "+message_split[1])
+            exec("self.send_champagne_cdf.emit(data)")
+
         else:
             self._window.open_dialog("Message du serveur incompréhensible",
                                      "Le message suivant n'a pas pu être décodé : {}".format(message), type="warning")
@@ -185,6 +190,7 @@ class CDFApp(App):
                                      "Le message suivant n'a pas pu être envoyé car mal encodé : {}".format(kwargs),
                                      type="warning")
             print("Error during encoding with arguments : %s" % kwargs)
+    
 
 
 if __name__ == '__main__':

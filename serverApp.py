@@ -1,6 +1,7 @@
 """Script defining the server app, inherited from the base App class."""
 from PyQt5.QtCore import pyqtSignal
 from openpyxl import Workbook
+import numpy as np
 
 from app import App
 from database import Database
@@ -23,6 +24,11 @@ class ServerApp(App):
         """Constructor."""
 
         self.__database = Database(DB_NAME)
+
+        #création d'une table history_champagne
+        max_drink = self.__database.select("SELECT MAX(id) FROM drinks")[0][0]
+        self.history_champagne = np.zeros((5, max_drink))
+        
         self._socket = ServerSocket()
 
         self.__reset_rooms()
@@ -213,11 +219,49 @@ class ServerApp(App):
         self.__database.execute("UPDATE stocks SET quantity=quantity+{} WHERE drink='{}' AND room='{}'".format(
             ((-1) ** sale) * quantity, id_drink, id_room))
 
+        list_champagne = self.__database.select("SELECT id FROM drinks WHERE is_champagne = 1")
+        for i in range(len(list_champagne)):
+            list_champagne[i]=list_champagne[i][0]
+        
         if not cancellation:
             # Inserting a row in the history
             self.__database.execute(
                 "INSERT INTO history(stamp, drink, room, quantity, is_sale) VALUES (datetime('now','+1 hour'), '{}', '{}', {}, {})".format(
                     id_drink, id_room, quantity, int(sale)))
+
+            # updating quantity_sold for the CDF
+            if int(id_drink) in list_champagne :
+                list_emit= []
+
+                
+                self.__database.execute("UPDATE stocks SET quantity_sold=quantity_sold+{} WHERE drink='{}' AND room='{}'".format(
+                                        sale * quantity, id_drink, id_room))
+
+                list_emit += self.__database.select("SELECT quantity_sold FROM stocks WHERE drink='{}' AND room='{}'".format(sale * quantity, id_drink, id_room))
+                list_emit += self.__database.select("SELECT quantity, stamp FROM history WHERE id = LAST_INSERT_ID()")
+
+                #self.send_champagne_cdf.emit([id_room, id_drink]+list_emit)
+                qteSoldChamp = self.__database.select("SELECT s.drink, s.room, s.quantity FROM stocks AS s JOIN drinks AS d WHERE d.id = s.drink AND d.is_champagne = 1")
+                
+                print(qteSoldChamp)
+                
+                qteChamp = np.zeros((len(list_champagne),5),int)
+##                for i in range(len(list_champagne)):
+##                    for j in range(5):
+##                        print(qteChamp[i][qteSoldChamp[i][1]])
+##                        print(qteSoldChamp[i][0])
+##                        qteChamp[i][qteSoldChamp[i][1]] = qteSoldChamp[i][0]
+
+                for i in qteSoldChamp:
+                    print(qteChamp[i[0]-1][i[1]-1], i)
+                    qteChamp[i[0]-1][i[1]-1] = i[2]
+                    print(qteChamp[i[0]-1][i[1]-1])
+                
+                self.encode_message(action="CH", qteChamp=qteChamp.transpose().tolist())
+
+                ##self.history_champagne[id_room-1, id_drink-1]=(self.__database.select("SELECT LAST_INSERT_ID() FROM history WHERE is_sale"))
+                
+            
 
             # Getting the id of the sale
             resp = self.__database.select("SELECT last_insert_rowid()")
@@ -279,9 +323,14 @@ class ServerApp(App):
 
     def cancel_sale(self, id_order):
         """Method used to cancel an order"""
-
+        print(id_order,type(id_order))
         # Update history table
         self.__database.execute("UPDATE history SET is_cancelled='{}' WHERE id='{}'".format(1, id_order))
+
+        liste = self.__database.select("SELECT drink, room FROM history WHERE id='{}'".format(id_order))
+        id_drink, id_room = liste[0]
+        
+        self.history_champagne[id_room-1, id_drink-1]=0
 
         # Cancelling sale in stocks
         resp = self.__database.select(
@@ -466,6 +515,7 @@ class ServerApp(App):
 
         elif message_split[0] == "AR":  # client cancel a sale
 
+            print(message_split[1])
             self.cancel_sale(message_split[1])
 
         elif message_split[0] == "ME":  # Message by a client
@@ -567,15 +617,21 @@ class ServerApp(App):
 
             self.encode_message(action='LA', recipient=client)
 
+        elif message_split[0] == "CH":
+
+            pass
+
         else:
 
             self._window.open_dialog("Message incompréhensible",
                                      "Le message suivant n'a pas pu être décodé : {}".format(message), type="warning")
             print("Error : message '%s' could not be decoded" % message)
 
+            
+
     def encode_message(self, **kwargs):
         """
-        :param kwargs: key 'action' related to agreed values: LA - AE - LO - DE - RT - RS - ME
+        :param kwargs: key 'action' related to agreed values: LA - AE - LO - DE - RT - RS - ME - CH
                        with following keys 'action' :
                             LA : use key 'recipient'
                             AE : use key 'canceled_sale_id' and 'recipient'
@@ -584,6 +640,7 @@ class ServerApp(App):
                             RT : use key 'drink_id'
                             RS : no effect for the moment
                             ME : use key 'message'
+                            CH : use key 'qteChamp'
         :return:
         """
         if kwargs["action"] == "LA":  # not connected bars list
@@ -722,12 +779,17 @@ class ServerApp(App):
 
             self._socket.send_message("|RE|{}|".format(kwargs['id_refuel']), kwargs['recipient'])
 
+        elif kwargs["action"] == "CH": # Champagne
+
+            self._socket.send_message("|CH|{}|".format(kwargs["qteChamp"]))
+
         else:
 
             self._window.open_dialog("Impossible d'envoyer un message",
                                      "Le message suivant n'a pas pu être envoyé car mal encodé : {}".format(kwargs),
                                      type="warning")
             print("Error during encoding \n arguments : %s" % kwargs)
+            
 
 
 if __name__ == '__main__':

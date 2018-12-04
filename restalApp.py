@@ -196,6 +196,10 @@ class RestalApp(App):
 
             self.send_message("|LA|")
 
+        elif message_split[0] == "CH":
+
+            pass
+
         else:
             self._window.open_dialog("Impossible d'envoyer un message",
                                      "Le message suivant n'a pas pu être envoyé car mal encodé : {}".format(kwargs),

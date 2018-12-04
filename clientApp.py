@@ -262,6 +262,10 @@ class ClientApp(App):
                         break
                 self._window.add_order(id, key, quantity)
 
+        elif message_split[0] == "CH":
+
+            pass
+
         else:
 
             self._window.open_dialog("Message du serveur incompréhensible",
