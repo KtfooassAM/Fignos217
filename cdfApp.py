@@ -57,6 +57,9 @@ class CDFApp(App):
        
         # Connecting the send message signal
         self._window.send_message.connect(lambda x: self.encode_message(action="ME", message=x))
+        
+        # Connecting the send urgent message signal
+        self._window.send_message_urgent.connect(lambda x: self.encode_message(action="UR", message=x))
 
         # Connecting for the connection dialog
         self._window.request_connection_infos.connect(

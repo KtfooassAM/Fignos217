@@ -58,6 +58,9 @@ class ClientApp(App):
         # Connecting the send message signal
         self._window.send_message.connect(lambda x: self.encode_message(action="ME", message=x))
 
+        # Connecting the send urgent message signal
+        self._window.send_message_urgent.connect(lambda x: self.encode_message(action="UR", message=x))
+
         # Connecting the drink orders
         self._window.order_drink.connect(self.__order_drink)
 

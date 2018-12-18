@@ -24,6 +24,7 @@ class Window(QMainWindow):
     set_connection_infos = pyqtSignal(tuple)
     set_bar_name = pyqtSignal(str)
     send_message = pyqtSignal(str)
+    send_message_urgent = pyqtSignal(str)
     ask_preferences = pyqtSignal()
     order_drink = pyqtSignal(str, bool)
     drop_base = pyqtSignal()
@@ -48,7 +49,7 @@ class Window(QMainWindow):
         app.message_received.connect(self.chat_panel.add_message)
         app.urgent_message_received.connect(self.chat_panel.add_message_urgent)
         self.chat_panel.send_message.connect(self.send_message)
-        self.chat_panel.send_message_urgent.connect(self.send_message)
+        self.chat_panel.send_message_urgent.connect(self.send_message_urgent)
         
         if location == Locations.BAR:
             self.main_widget.order_drink.connect(self.order_drink)

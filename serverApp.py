@@ -90,6 +90,9 @@ class ServerApp(App):
         # Connecting the send message signal
         self._window.send_message.connect(lambda x: self.encode_message(action="ME", message=x))
 
+        # Connecting the send urgent message signal
+        self._window.send_message_urgent.connect(lambda x: self.encode_message(action="UR", message=x))
+
         # Connecting the cancellation of an order
         self._window.cancel_order.connect(lambda x: self.cancel_sale(x))
 
