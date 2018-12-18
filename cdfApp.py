@@ -212,10 +212,15 @@ class CDFApp(App):
 
             self.send_message("|GC|")
 
-        elif kwargs["action"] == "ME" & kwargs["action"] == "UR":
+        elif kwargs["action"] == "ME" :
 
             self.send_message("|%s|%s|" % (kwargs["action"], kwargs["message"]))
 
+        elif kwargs["action"] == "UR":
+
+            print("Sending tchat message '{}'".format(kwargs['message']))
+            self.send_message("|%s|%s|" % (kwargs["action"], kwargs["message"]))
+            
         elif kwargs["action"] == "LA":
 
             self.send_message("|LA|")
