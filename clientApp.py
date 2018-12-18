@@ -321,7 +321,12 @@ class ClientApp(App):
             else:
                 print("You must specify a sale to be cancelled.")
 
-        elif (kwargs["action"] == "ME") & (kwargs["action"] == "UR"):
+        elif kwargs["action"] == "ME":
+
+            print("Sending tchat message '{}'".format(kwargs['message']))
+            self.send_message("|%s|%s|" % (kwargs["action"], kwargs["message"]))
+
+        elif kwargs["action"] == "UR":
 
             print("Sending tchat message '{}'".format(kwargs['message']))
             self.send_message("|%s|%s|" % (kwargs["action"], kwargs["message"]))
