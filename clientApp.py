@@ -164,6 +164,21 @@ class ClientApp(App):
 
             self._window.remove_cancelled_order(message_split[1])
 
+        elif message_split[0] == 'UR':
+
+            print("New message received : '{}'".format(message))
+
+            if len(message_split) == 3:  # Author was found
+                infos = (message_split[2], message_split[1])
+            elif len(message_split) == 2:  # No author
+                infos = (message_split[1],)
+            try:
+                self.urgent_message_received.emit(infos)
+            except UnboundLocalError:
+                self._window.open_dialog("Message de chat incompréhensible",
+                                         "Le message de chat suivant n'a pas pu être décodé : {}".format(message),
+                                         type="warning")
+
         elif message_split[0] == 'ME':
 
             print("New message received : '{}'".format(message))
@@ -303,7 +318,7 @@ class ClientApp(App):
             else:
                 print("You must specify a sale to be cancelled.")
 
-        elif kwargs["action"] == "ME":
+        elif (kwargs["action"] == "ME") & (kwargs["action"] == "UR"):
 
             print("Sending tchat message '{}'".format(kwargs['message']))
             self.send_message("|%s|%s|" % (kwargs["action"], kwargs["message"]))

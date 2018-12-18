@@ -55,7 +55,7 @@ class ServerApp(App):
 
         # Connecting the socket messages
         self._socket.message_received.connect(lambda m: self.decode_message(m[0], client=m[1].peerAddress().toString()))
-
+        
         # Connecting the clients disconnection
         self._socket.client_disconnected.connect(
             lambda x: self.__database.execute("UPDATE rooms SET connected=0 WHERE ip='{}'".format(x)))
@@ -75,6 +75,9 @@ class ServerApp(App):
 
         # Sending the bar names when requested
         self._window.get_bar_names.connect(lambda: self.send_bar_names.emit(self._get_bar_names()))
+
+        # Sending the champagne names when requested
+        self._window.get_champagne_names.connect(lambda: self.send_champagne_names.emit(self._get_champagne_names()))
 
         # Setting the name when requested
         self._window.set_bar_name.connect(self.__set_name)
@@ -164,6 +167,13 @@ class ServerApp(App):
         resp = self.__database.select("SELECT name FROM rooms WHERE connected=0")
         return [b[0] for b in resp]
 
+    def _get_champagne_names(self):
+        """Method getting the champagnes names."""
+
+        resp = self.__database.select("SELECT name FROM drinks WHERE is_champagne=1")
+        print("get champ: ",resp)
+        return [b[0] for b in resp]
+
     def __set_name(self, name):
         """Method called to set the name of the server."""
         self._name = name
@@ -219,9 +229,30 @@ class ServerApp(App):
         self.__database.execute("UPDATE stocks SET quantity=quantity+{} WHERE drink='{}' AND room='{}'".format(
             ((-1) ** sale) * quantity, id_drink, id_room))
 
+        self.__database.execute("UPDATE stocks SET consommation = consommation + {} WHERE drink='{}' AND room='{}'".format(
+            sale * quantity , id_drink, id_room))
+        
+        if cancellation:
+            self.__database.execute("UPDATE stocks SET consommation = consommation + {} WHERE drink='{}' AND room='{}'".format(
+            -1*quantity , id_drink, id_room))
+            
         list_champagne = self.__database.select("SELECT id FROM drinks WHERE is_champagne = 1")
         for i in range(len(list_champagne)):
             list_champagne[i]=list_champagne[i][0]
+            if int(id_drink) in list_champagne :
+                list_emit= []
+                
+                self.__database.execute("UPDATE stocks SET quantity_sold=quantity_sold+{} WHERE drink='{}' AND room='{}'".format(
+                                        sale * quantity, id_drink, id_room))
+
+                qteSoldChamp = self.__database.select("SELECT s.drink, s.room, s.consommation FROM stocks AS s JOIN drinks AS d WHERE d.id = s.drink AND d.is_champagne = 1")
+                
+                qteChamp = np.zeros((len(list_champagne),5),int)
+                
+                for i in qteSoldChamp:
+                    qteChamp[i[0]-1][i[1]-1] = i[2]
+                
+                self.encode_message(action="CH", qteChamp=qteChamp.transpose().tolist())
         
         if not cancellation:
             # Inserting a row in the history
@@ -232,30 +263,16 @@ class ServerApp(App):
             # updating quantity_sold for the CDF
             if int(id_drink) in list_champagne :
                 list_emit= []
-
                 
                 self.__database.execute("UPDATE stocks SET quantity_sold=quantity_sold+{} WHERE drink='{}' AND room='{}'".format(
                                         sale * quantity, id_drink, id_room))
 
-                list_emit += self.__database.select("SELECT quantity_sold FROM stocks WHERE drink='{}' AND room='{}'".format(sale * quantity, id_drink, id_room))
-                list_emit += self.__database.select("SELECT quantity, stamp FROM history WHERE id = LAST_INSERT_ID()")
-
-                #self.send_champagne_cdf.emit([id_room, id_drink]+list_emit)
-                qteSoldChamp = self.__database.select("SELECT s.drink, s.room, s.quantity FROM stocks AS s JOIN drinks AS d WHERE d.id = s.drink AND d.is_champagne = 1")
-                
-                print(qteSoldChamp)
+                qteSoldChamp = self.__database.select("SELECT s.drink, s.room, s.consommation FROM stocks AS s JOIN drinks AS d WHERE d.id = s.drink AND d.is_champagne = 1")
                 
                 qteChamp = np.zeros((len(list_champagne),5),int)
-##                for i in range(len(list_champagne)):
-##                    for j in range(5):
-##                        print(qteChamp[i][qteSoldChamp[i][1]])
-##                        print(qteSoldChamp[i][0])
-##                        qteChamp[i][qteSoldChamp[i][1]] = qteSoldChamp[i][0]
-
+                
                 for i in qteSoldChamp:
-                    print(qteChamp[i[0]-1][i[1]-1], i)
                     qteChamp[i[0]-1][i[1]-1] = i[2]
-                    print(qteChamp[i[0]-1][i[1]-1])
                 
                 self.encode_message(action="CH", qteChamp=qteChamp.transpose().tolist())
 
@@ -569,6 +586,55 @@ class ServerApp(App):
 
             # self._socket.send_message(message)  # Broadcasting the message.
             # self.message_received.emit(message_split[1])
+            
+        elif message_split[0] == "UR":  # Message by a client
+
+            # Getting the client's name
+            client_name = ""
+            resp = self.__database.select("SELECT name FROM rooms WHERE ip='{}' AND connected=1".format(client))
+            if len(resp) > 0:  # Client found
+                client_name = resp[-1][0]
+                new_message = client_name + '|' + message[3:]
+            else:
+                new_message = message
+                print("No client found matching the ip '{}'".format(client))
+
+            # Checking for the receiver
+            dests = [word[1:] for word in message[3:].split(' ') if
+                     word.startswith('@')]  # Words starting with '@' in the message
+            ips = []
+            for d in dests:
+                resp = self.__database.select("SELECT ip FROM rooms WHERE name='{}'".format(d.lower()))
+                if len(resp) > 0:  # At least one match found
+                    ips.append(resp[-1][0])
+
+            # print("Relaying message '{}' to ips '{}'".format(new_message, ips))
+
+            # Preparing the message for the UI
+            if client_name:
+                infos = (message[3:], client_name)
+            else:
+                infos = (message[3:],)
+
+            # Sending the message
+            if ips:  # Some specific receivers were found
+
+                # Fetching CDF ip
+                resp = self.__database.select("SELECT ip FROM rooms WHERE name='cdf'")
+                if len(resp) > 0 and resp[-1][0] not in ips:
+                    ips.append(resp[-1][0])
+
+                for ip in ips:
+                    if ip == self._socket.get_address().toString():
+                        self.urgent_message_received.emit(infos)  # Sending the message to the UI
+                    else:
+                        self._socket.send_message("|UR|{}|".format(new_message), ip)
+                if client not in ips:
+                    self._socket.send_message("|UR|{}|".format(new_message), client)
+
+            else:
+                self._socket.send_message("|UR|{}|".format(new_message))
+                self.urgent_message_received.emit(infos)  # Sending the message to the UI
 
         elif message_split[0] == "RE":  # refueled
 
@@ -617,6 +683,10 @@ class ServerApp(App):
 
             self.encode_message(action='LA', recipient=client)
 
+        elif message_split[0] == "GC":
+
+            self.encode_message(action='GC', recipient=client)
+                                                 
         elif message_split[0] == "CH":
 
             pass
@@ -650,6 +720,15 @@ class ServerApp(App):
             print("Sending list of bars '{}' to client '{}'".format(new_message[3:], kwargs['recipient']))
             self._socket.send_message(new_message, kwargs['recipient'])
 
+        elif kwargs["action"] == "GC":
+                
+            names = self.__database.select("SELECT name FROM drinks WHERE is_champagne=1")
+            rooms = self.__database.select("SELECT name FROM rooms WHERE is_bar=1")
+            
+            new_message = "|GC|" + ','.join([str(n[0]) for n in names]) + '|' + ','.join([str(n[0]) for n in rooms]) + '|'
+            
+            self._socket.send_message(new_message, kwargs['recipient'])
+                                                 
         elif kwargs["action"] == "AE":  # inform that one sale was canceled
 
             self._socket.send_message("|%s|%s|" % (kwargs["action"], kwargs["canceled_sale_id"]), kwargs["recipient"])
@@ -762,6 +841,54 @@ class ServerApp(App):
             # else:  # No recipient provided
             #     self._socket.send_message("ME|{}".format(kwargs["message"]))
             # self.message_received.emit(kwargs["message"])
+
+        elif kwargs["action"] == "UR":  # Urgent-Message by the server
+
+            print("Encoding message '{}'".format(kwargs["message"]))
+
+            # Getting the server's name
+            name = ""
+            resp = self.__database.select(
+                "SELECT name FROM rooms WHERE ip='{}' AND connected=1".format(self._socket.get_address().toString()))
+            if len(resp) > 0:  # At least one match was found
+                name = resp[-1][0]  # By default we select the last one
+                message = "|UR|" + name + '|' + kwargs["message"] + '|'  # Rewriting the message
+            else:
+                message = "|UR|" + kwargs["message"] + '|'
+
+            print("Message became '{}'".format(message))
+
+            # Checking for the receiver
+            dests = [word[1:] for word in kwargs["message"].split(' ') if
+                     word.startswith('@')]  # Words starting with '@' in the message
+            ips = []
+            for d in dests:
+                resp = self.__database.select("SELECT ip FROM rooms WHERE name='{}'".format(d.lower()))
+                if len(resp) > 0:  # At least one match found
+                    ips.append(resp[-1][0])
+
+            print("Sending message '{}' to ips '{}'.".format(message, ips))
+
+            # Sending the message
+            if ips:  # Some specific receivers were found
+
+                # Fetching CDF ip
+                resp = self.__database.select("SELECT ip FROM rooms WHERE name='cdf'")
+                if len(resp) > 0 and resp[-1][0] not in ips:
+                    ips.append(resp[-1][0])
+
+                for ip in ips:
+                    self._socket.send_message(message, ip)
+                # No need to send the message to himself
+            else:
+                self._socket.send_message(message)
+
+            # Sending the message to the UI
+            if name:
+                infos = (kwargs["message"], name)
+            else:
+                infos = (kwargs["message"],)
+            self.urgent_message_received.emit(infos)
 
         elif kwargs["action"] == "VE":  # Confirmation of sales
 

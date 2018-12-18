@@ -28,13 +28,20 @@ class cdfWidget(QWidget):
     def setValues(self, data):
         
         self.graph_widget.plot(data)
+
+    def _CDFApp__set_champagne(self, champagne, rooms):
+        """Method called to set the champagne's name."""
+
+        self.graph_widget.set_champagne(champagne, rooms)
         
 class PlotCanvas(FigureCanvas):
  
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
 
-        self.n_champ = 3
+        self.n_champ = 1
+        self.x = [""]
+        self.rooms = ["","","","",""]
  
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
@@ -51,14 +58,16 @@ class PlotCanvas(FigureCanvas):
         
         self.ax = self.figure.add_subplot(111)
 
-        self.x = ["Cordelier","Dom Perignon", "Truc", "Machin", "Bidule"][:self.n_champ]
-
         data = np.zeros((n_bar,self.n_champ),int)
         data = data.tolist()
-        print(data)
         
         self.plot(data)
-        
+
+    def set_champagne(self, champagne, rooms):
+        self.n_champ = len(champagne)
+        self.x = champagne
+        self.rooms = rooms
+        self.initPlot()
          
     def plot(self, data):
         self.ax.clear()
@@ -72,7 +81,7 @@ class PlotCanvas(FigureCanvas):
         self.salle5 = self.ax.bar(self.x, data[4], bottom=[sum(dataT[i,:4]) for i in range(self.n_champ)],color = "#BF3547")
 
         self.ax.legend((self.salle1[0], self.salle2[0], self.salle3[0], self.salle4[0], self.salle5[0]),
-                       ("Salle 1", "Salle 2", "Salle 3", "Salle 4", "Salle 5"))        
+                       self.rooms)        
         self.ax.set_title("Consommation de Champ'ss")
         self.draw()   
         

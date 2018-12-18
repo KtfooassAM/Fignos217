@@ -15,6 +15,7 @@ class ChatPanel(QWidget):
     Add message to chat panel : ChatPanel.add_message("message")"""
 
     send_message = pyqtSignal(str)
+    send_message_urgent = pyqtSignal(str)
 
     def __init__(self):
         """Constructor"""
@@ -31,7 +32,7 @@ class ChatPanel(QWidget):
         main_layout = QVBoxLayout()
 
         # Creating the message list (Important)
-        message_list_important = VerticalScroll(top_stretch=True)
+        self.message_list_important = VerticalScroll(top_stretch=True)
 
         # Creating tje message list (General)
         self.message_list_general = VerticalScroll(top_stretch=True)
@@ -49,7 +50,7 @@ class ChatPanel(QWidget):
 
         # Creating the 'urgent' button
         send_message_button_urgent = QPushButton("Urgent", self)
-        send_message_button_urgent.clicked.connect(self.__send_message)
+        send_message_button_urgent.clicked.connect(self.__send_message_urgent)
 
         # Adding the widgets to the bottom layout
         new_message_layout.addWidget(self.new_message_entry)
@@ -58,7 +59,7 @@ class ChatPanel(QWidget):
 
         # Adding everything to the main layout
         main_layout.addWidget(QLabel("Discussion"))
-        main_layout.addWidget(message_list_important,stretch = 1)
+        main_layout.addWidget(self.message_list_important,stretch = 1)
         main_layout.addWidget(self.message_list_general, stretch = 2)
         main_layout.addLayout(new_message_layout)
    
@@ -80,9 +81,30 @@ class ChatPanel(QWidget):
             self.new_message_entry.clear()
 
             # Test
+            self.add_message((message,))
+            
+            
+
+
+            
+    def __send_message_urgent(self):
+        """Method triggered by the 'Send Urgent' button sending the message."""
+
+        # Getting the message to be sent
+        message = self.new_message_entry.text()
+
+        if message:
+            # Sending the message
+            self.send_message_urgent.emit(message)
+
+            # Clearing the entry for another message to be sent
+            self.new_message_entry.clear()
+
+            # Test
+            self.add_message_urgent((message,))
 
     def keyPressEvent(self, event):
-        """Method handling the key press events."""
+        """Method handling the key press events. Only for not important messages"""
 
         # Key pressed was Enter (both of them) : sending the message
         if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
@@ -98,6 +120,18 @@ class ChatPanel(QWidget):
             wid = MessageWidget(msg[0],"Inconnu")
         wid.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.message_list_general.add_widget(wid)
+
+        
+    def add_message_urgent(self,msg):
+        """Method to add message to the list"""
+        # Revoir les formats des messages
+        print(msg)
+        if len(msg) == 2:
+            wid = MessageWidget(msg[0],msg[1])
+        elif len(msg) == 1:
+            wid = MessageWidget(msg[0],"Inconnu")
+        wid.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.message_list_important.add_widget(wid)
 
         # Putting the VerticalScroll downest as possible
         # self.scroll.verticalScrollBar().setValue(self.scroll.verticalScrollBar().maximum())

@@ -12,6 +12,7 @@ class CDFApp(App):
     """Class defining all methods necessary to the CDF app."""
 
     send_bar_names = pyqtSignal(list)
+    send_champagne_names = pyqtSignal(list)
     name_set = pyqtSignal()
 
     def __init__(self):
@@ -40,8 +41,13 @@ class CDFApp(App):
         # Connecting the bar names request
         self._window.get_bar_names.connect(lambda: self.encode_message(action="LA"))
 
+        self._window.get_champagne_names.connect(lambda: self.encode_message(action="GC"))
+
         # Setting the bar name when requested
         self._window.set_bar_name.connect(self.__set_name)
+
+        # Setting the champagne name when requested
+        self.send_champagne_names.connect(self._window.main_widget.__set_champagne)
 
         # Connecting the preferences
         self._window.ask_preferences.connect(
@@ -94,6 +100,7 @@ class CDFApp(App):
         self._window.chat_panel.place_name = name
         self.encode_message(action="NO", selected_name=name)
 
+
     def connect_to_server(self, host=HOST, port=PORT):
         """Method connecting the client to a given server."""
         # HOST = server.ipAddress
@@ -137,6 +144,12 @@ class CDFApp(App):
             list_bars = message_split[1].split(',')
             self.send_bar_names.emit(list_bars)  # Sending the list to the UI
 
+        elif message_split[0] == 'GC':
+            
+            list_champagne = message_split[1].split(',')
+            list_rooms = message_split[2].split(',')
+            self._window.main_widget.__set_champagne(list_champagne,list_rooms)
+            
         elif message_split[0] == 'ME':
 
             print("New message received : '{}'".format(message))
@@ -152,6 +165,21 @@ class CDFApp(App):
                                          "Le message de chat suivant n'a pas pu être décodé : {}".format(message),
                                          type="warning")
 
+        elif message_split[0] == 'UR':
+
+            print("New message received : '{}'".format(message))
+
+            if len(message_split) == 3:  # Author was found
+                infos = (message_split[2], message_split[1])
+            elif len(message_split) == 2:  # No author
+                infos = (message_split[1],)
+            try:
+                self.urgent_message_received.emit(infos)
+            except UnboundLocalError:
+                self._window.open_dialog("Message de chat incompréhensible",
+                                         "Le message de chat suivant n'a pas pu être décodé : {}".format(message),
+                                         type="warning")
+                
         elif message_split[0] == 'LO':  # Message is '|LO|' so just ignoring it
 
             self.name_set.emit()  # Warning the UI about the name being set
@@ -177,13 +205,21 @@ class CDFApp(App):
 
             self.send_message("|%s|%s|" % (kwargs["action"], kwargs["selected_name"]))
 
-        elif kwargs["action"] == "ME":
+        elif kwargs["action"] == "GC":
+
+            self.send_message("|GC|")
+
+        elif kwargs["action"] == "ME" & kwargs["action"] == "UR":
 
             self.send_message("|%s|%s|" % (kwargs["action"], kwargs["message"]))
 
         elif kwargs["action"] == "LA":
 
             self.send_message("|LA|")
+
+        elif kwargs["action"] == "LE":
+
+            pass
 
         else:
             self._window.open_dialog("Impossible d'envoyer un message",

@@ -20,6 +20,7 @@ class Window(QMainWindow):
     export_db = pyqtSignal(str)
     get_connection_infos = pyqtSignal()
     get_bar_names = pyqtSignal()
+    get_champagne_names = pyqtSignal()
     set_connection_infos = pyqtSignal(tuple)
     set_bar_name = pyqtSignal(str)
     send_message = pyqtSignal(str)
@@ -45,7 +46,10 @@ class Window(QMainWindow):
 
         # Connecting signals
         app.message_received.connect(self.chat_panel.add_message)
+        app.urgent_message_received.connect(self.chat_panel.add_message_urgent)
         self.chat_panel.send_message.connect(self.send_message)
+        self.chat_panel.send_message_urgent.connect(self.send_message)
+        
         if location == Locations.BAR:
             self.main_widget.order_drink.connect(self.order_drink)
             self.__app.refuelling_in_progress.connect(self.add_refuel_notif)
@@ -281,6 +285,7 @@ class Window(QMainWindow):
         self.__app.connection_established.connect(preferences.validate_connection_infos)
         # Handling bar names signals
         self.__app.connection_established.connect(self.get_bar_names.emit)  # Asking for bar names
+        self.__app.connection_established.connect(self.get_champagne_names.emit) #Asking for champagne names
 
         self.__app.send_bar_names.connect(preferences.set_names)
         preferences.barParameters.connect(lambda x: print("Preferences dialog returned :'{}'.".format(x)))

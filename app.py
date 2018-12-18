@@ -11,6 +11,7 @@ class App(QObject):
 
     send_connection_infos = pyqtSignal(list)
     send_bar_names = pyqtSignal(list)
+    send_champagne_names = pyqtSignal(list)
     connection_established = pyqtSignal(tuple)
     name_set = pyqtSignal()
     fill_preferences = pyqtSignal(tuple, str)
@@ -19,6 +20,7 @@ class App(QObject):
     
 
     message_received = pyqtSignal(tuple)
+    urgent_message_received = pyqtSignal(tuple)
 
     def __init__(self, exit_on_quit=True):
         """Constructor."""
