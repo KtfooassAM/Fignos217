@@ -146,13 +146,14 @@ class MessageWidget(QWidget):
         self.source = src
         self.hour = QTime.currentTime().toString()
 
-        self.dico_color = {'Vinci':"QLabel {color:#8e2562}",
-                           'Bar 2':"QLabel {color:#f29400}",
-                           'Bar 3':"QLabel {color:#55bf35}",
-                           'Bar 4':"QLabel {color:#0000ff}",
-                           'Bar 5':"QLabel {color:#bf3547}",
+        self.dico_color = {'Mexico':"QLabel {color:#8e2562}",
+                           'Chine':"QLabel {color:#f29400}",
+                           'Rio':"QLabel {color:#55bf35}",
+                           'Venise':"QLabel {color:#0000ff}",
+                           "K've":"QLabel {color:#bf3547}",
                            'Reserve':"QLabel {color:orange}",
                            'CDF':"QLabel {background-color:pink}",
+                           'Restal':"QLabel {color:brown}",
                            'Inconnu':"QLabel {color:#ffffff}"}
 
         self.__init_UI()
