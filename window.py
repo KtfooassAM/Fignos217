@@ -6,11 +6,10 @@ from PyQt5.QtWidgets import *  # qApp, QMainWindow, QWidget, QHBoxLayout, QActio
 
 from chatPanel import ChatPanel
 from connectionDialog import ConnectionDialog
-from preferencesDialog_v2 import PreferencesDialog
+from preferencesDialog import PreferencesDialog
 from informationDialog import InformationDialog
 from locations import Locations
 from ordersPanel import OrdersPanel
-from preferencesDialog_v2 import PreferencesDialog
 
 
 class Window(QMainWindow):

@@ -5,7 +5,7 @@ import numpy as np
 
 from app import App
 from database import Database
-from serverSocket_v2 import ServerSocket
+from serverSocket import ServerSocket
 from window import Window, Locations
 
 DB_NAME = 'fignos.db'
