@@ -58,8 +58,8 @@ class ServerApp(App):
         self._socket.message_received.connect(lambda m: self.decode_message(m[0], client=m[1].peerAddress().toString()))
         
         # Connecting the clients disconnection
-        self._socket.client_disconnected.connect(
-            lambda x: self.__database.execute("UPDATE rooms SET connected=0 WHERE ip='{}'".format(x)))
+        # self._socket.client_disconnected.connect(
+        #    lambda x: self.__database.execute("UPDATE rooms SET connected=0 WHERE ip='{}'".format(x)))
 
         # Connecting the export signal
         self._window.export_db.connect(self.__exportDB)
