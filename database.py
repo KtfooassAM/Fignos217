@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding : iso_1 -*-
+
 """Script defining a Database class for a better handling of the SQL functions."""
 
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
@@ -28,7 +31,7 @@ class Database:
 
     def import_(self, file_name):
         """Method importing a SQL file."""
-        with open(file_name, 'r') as f:
+        with open(file_name, 'r', encoding='utf-8') as f:
             for l in f.readlines():
                 print(l)
                 self.execute(l)

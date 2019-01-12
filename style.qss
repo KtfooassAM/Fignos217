@@ -15,7 +15,7 @@ QWidget {
     border-image: none;
     border: 0px transparent black;
     outline: 0;
-	font: 15pt arial;
+	font: bold 12pt Arial;
 }
 
 QWidget:item:hover {

@@ -39,6 +39,7 @@ class ServerApp(App):
         """Destructor."""
         print("Setting all rooms to disconnected.")
         self.__database.execute("UPDATE rooms SET connected=0")
+        self.__database.execute("UPDATE rooms SET ip=Null")
 
     def _open_window(self):
         """Method replacing the App's one opening the server window."""
@@ -675,6 +676,7 @@ class ServerApp(App):
                 ip = resp[-1][0]
 
             # Fetching sender bar name
+            print(client)
             resp = self.__database.select("SELECT name FROM rooms WHERE ip='{}'".format(client))
             if len(resp) > 0:
                 bar = resp[-1][0]

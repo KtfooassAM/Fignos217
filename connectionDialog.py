@@ -29,7 +29,7 @@ class ConnectionDialog(QDialog):
         """Method creating the UI for this window."""
 
         # Setting title
-        self.setWindowTitle("Préférences")
+        self.setWindowTitle("Connexion")
 
         # Creating main layout
         main_layout = QVBoxLayout()

@@ -37,13 +37,19 @@ class cdfWidget(QWidget):
 class PlotCanvas(FigureCanvas):
  
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
 
         self.n_champ = 1
         self.x = [""]
         self.rooms = ["","","","",""]
+
+        with open("style.qss","r") as f:
+            lines = f.readlines()
+            self.background_color = lines[10].split(' ')[5][:-2]
+            self.frame_color = lines[460].split(' ')[7][:-2]
+
  
-        FigureCanvas.__init__(self, fig)
+        FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
  
         FigureCanvas.setSizePolicy(self,
@@ -83,6 +89,21 @@ class PlotCanvas(FigureCanvas):
         self.ax.legend((self.salle1[0], self.salle2[0], self.salle3[0], self.salle4[0], self.salle5[0]),
                        self.rooms)        
         self.ax.set_title("Consommation de Champ'ss")
+
+        self.fig.patch.set_facecolor(self.background_color)
+        self.ax.patch.set_facecolor(self.background_color)
+
+        self.ax.spines['bottom'].set_color(self.frame_color)
+        self.ax.spines['top'].set_color(self.frame_color) 
+        self.ax.spines['right'].set_color(self.frame_color)
+        self.ax.spines['left'].set_color(self.frame_color)
+
+        self.ax.title.set_color('white')
+
+        self.ax.tick_params(axis='x', colors='white')
+        self.ax.tick_params(axis='y', colors='white')
+
+
         self.draw()   
         
         

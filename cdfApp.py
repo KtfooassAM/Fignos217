@@ -191,6 +191,10 @@ class CDFApp(App):
 
             pass
 
+        elif message_split[0] == 'RS':
+
+            pass
+        
         elif  message_split[0] == "CH":
 
             exec("data = "+message_split[1])

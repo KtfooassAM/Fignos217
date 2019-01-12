@@ -27,6 +27,7 @@ INSERT INTO drinks(name, container_size, threshold) VALUES('Atome', 12, 12);
 INSERT INTO drinks(name, container_size, threshold) VALUES('Eclair', 20, 20);
 -- Creating food --
 INSERT INTO food(name) VALUES ('Tapas');
+INSERT INTO food(name) VALUES ('Tapas pas bon');
 -- Creating rooms --
 INSERT INTO rooms(name, ip, connected, is_bar) VALUES('chine', '', 0, 1)
 INSERT INTO rooms(name, ip, connected, is_bar) VALUES('venise', '', 0, 1)

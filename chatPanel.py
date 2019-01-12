@@ -81,7 +81,7 @@ class ChatPanel(QWidget):
             self.new_message_entry.clear()
 
             # Test
-            self.add_message((message,))
+            # self.add_message((message,))
             
             
 
@@ -101,7 +101,7 @@ class ChatPanel(QWidget):
             self.new_message_entry.clear()
 
             # Test
-            self.add_message_urgent((message,))
+            # self.add_message_urgent((message,))
 
     def keyPressEvent(self, event):
         """Method handling the key press events. Only for not important messages"""
@@ -109,6 +109,10 @@ class ChatPanel(QWidget):
         # Key pressed was Enter (both of them) : sending the message
         if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
             self.__send_message()
+
+        # Key pressed was Enter (both of them) : sending the message
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and event.key() == Qt.Key_Shift:
+            self.__send_message_urgent()
             
     def add_message(self,msg):
         """Method to add message to the list"""
@@ -146,14 +150,14 @@ class MessageWidget(QWidget):
         self.source = src
         self.hour = QTime.currentTime().toString()
 
-        self.dico_color = {'Mexico':"QLabel {color:#8e2562}",
-                           'Chine':"QLabel {color:#f29400}",
-                           'Rio':"QLabel {color:#55bf35}",
-                           'Venise':"QLabel {color:#0000ff}",
-                           "K've":"QLabel {color:#bf3547}",
-                           'Reserve':"QLabel {color:orange}",
-                           'CDF':"QLabel {background-color:pink}",
-                           'Restal':"QLabel {color:brown}",
+        self.dico_color = {'mexico':"QLabel {color:#8e2562}",
+                           'chine':"QLabel {color:#f29400}",
+                           'rio':"QLabel {color:#55bf35}",
+                           'venise':"QLabel {color:#0000ff}",
+                           "K'Ve":"QLabel {color:#bf3547}",
+                           'reserve':"QLabel {color:yellow}",
+                           'cdf':"QLabel {background-color:pink; color:#875121}",
+                           'restal':"QLabel {color:brown}",
                            'Inconnu':"QLabel {color:#ffffff}"}
 
         self.__init_UI()
@@ -162,15 +166,13 @@ class MessageWidget(QWidget):
         
         message_layout = QHBoxLayout()
 
-        hour_slot = QLabel(self.hour)
-        sender_name = QLabel(self.source + " :")
+        sender_name = QLabel(self.hour + " " + self.source + " :")
         if self.source in self.dico_color:
             sender_name.setStyleSheet(self.dico_color[self.source])
 
         
         message_slot = QLabel(self.message)
         
-        message_layout.addWidget(hour_slot,stretch=1)
         message_layout.addWidget(sender_name,stretch=1)
         message_layout.addWidget(message_slot,stretch=3)
         self.setLayout(message_layout) 
