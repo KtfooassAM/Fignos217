@@ -1,199 +1,223 @@
-"""Script defining the preferences window."""
+"""Script defining the preferences dialog."""
 
-import sys
-
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QApplication
 
-
-class SendConnectionInfos(QObject):  # No
-    emitParameters = pyqtSignal(tuple)
-
-
-class SendBarChose(QObject):  # No
-    emitParameters = pyqtSignal(str)
-
-
-class SendParameters(QObject):  # No
-    emitParameters = pyqtSignal(dict)
-
-
-class Communicate(QObject):  # Yes
-    sendConnectionInfos = pyqtSignal(tuple)
-    sendBarChoice = pyqtSignal(str)
-    sendParameters = pyqtSignal(dict)
-
-
-class ConnectionWidget(QWidget):
-    """ Class defining a dialog widget to retrieve IP and port from user. """
-
-    def __init__(self, dialog_window):
-        """Constructor."""
-        QWidget.__init__(self)
-        self.__initUI(dialog_window)
-
-    def __initUI(self, dialog_window):
-        self.c = SendConnectionInfos()
-        self.c.emitParameters.connect(dialog_window.receive_connection_info)
-
-        frame = QFrame(self)
-        frame.setFrameShape(QFrame.StyledPanel)
-        frame.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        main_layout = QFormLayout()
-
-        ip_label = QLabel("Adresse IP :")
-        self.ip_cb = QComboBox(self)
-        self.ip_cb.activated[str].connect(self.__cbChanged)
-        # self.ip = ip_list[0]
-        #
-        # for ip in ip_list:
-        #    self.ip_cb.addItem(ip)
-        self.ip = ""
-
-        main_layout.addRow(ip_label, self.ip_cb)
-
-        port_label = QLabel("Port de connexion :")
-        self.port_le = QLineEdit()
-        main_layout.addRow(port_label, self.port_le)
-
-        button = QPushButton("Connexion")
-        button.clicked.connect(self.send)
-        main_layout.addRow(button)
-
-        frame.setLayout(main_layout)
-
-        layout = QHBoxLayout()
-        layout.addWidget(frame)
-        self.setLayout(layout)
-
-    def __cbChanged(self, text):
-        self.ip = text
-
-    def send(self):
-        ip = self.ip
-        port = self.port_le.text()
-        self.c.emitParameters.emit((ip, port))
-
-
-class BarWidget(QWidget):
-    """ Class defining a dialog window to retrieve the bar. """
-
-    def __init__(self, dialog_window, bar_list):
-        """Constructor."""
-        QWidget.__init__(self)
-        self.__initUI(dialog_window, bar_list)
-
-    def __initUI(self, dialog_window, bar_list):
-
-        frame = QFrame(self)
-        frame.setFrameShape(QFrame.StyledPanel)
-
-        main_layout = QFormLayout()
-
-        self.c = SendBarChose()
-        self.c.emitParameters.connect(dialog_window.receive_bar_info)
-
-        bar_label = QLabel("Choisissez votre bar :")
-        self.bar_cb = QComboBox(self)
-        self.bar_cb.activated[str].connect(self.__cbChanged)
-        self.bar = bar_list[0]
-        for bar in bar_list:
-            self.bar_cb.addItem(bar)
-        main_layout.addRow(bar_label, self.bar_cb)
-
-        bar_creation_label = QLabel("Ou créez votre bar :")
-        self.create_le = QLineEdit()
-        main_layout.addRow(bar_creation_label, self.create_le)
-
-        button = QPushButton("Valider")
-        button.clicked.connect(self.send)
-        main_layout.addRow(button)
-
-        frame.setLayout(main_layout)
-
-        layout = QHBoxLayout()
-        layout.addWidget(frame)
-        self.setLayout(layout)
-
-    def __cbChanged(self, text):
-        self.bar = text
-
-    def send(self):
-        if self.create_le.text() != "":
-            bar = self.create_le.text()
-        else:
-            bar = self.bar
-        self.c.emitParameters.emit(bar)
-
+from locations import Locations
 
 class PreferencesDialog(QDialog):
-    """ Class defining a dialog window to set preferences."""
+	"""Class defining the preferences dialog window."""
 
-    def __init__(self, location):
-        """Constructor."""
-        QDialog.__init__(self)
+	def __init__(self):
+		"""Constructor. This class must be executed directly by calling this.exec_()."""
+		QDialog.__init__(self)
 
-        # Initializing output
-        self.parameters = {}
-
-        # Initializing the UI
-        self.__initUI(location)
-
-    def __initUI(self, location):
-        """Method initializing the UI."""
-
-        self.main_layout = QVBoxLayout()
-
-        self.c = SendParameters()  # No then
-        self.c.emitParameters.connect(receive_preferences)
-
-        # try:
-        #     self.connect_widget = ConnectionWidget(self, ip_list)
-        # except:
-        #     self.connect_widget = ConnectionWidget(self, [""])
-        #     self.connect_widget.setEnabled(False)
-        self.connect_widget = ConnectionWidget(self)
-
-        self.bar_widget = BarWidget(self, [""])
-        self.bar_widget.setEnabled(False)
-
-        self.main_layout.addWidget(self.connect_widget)
-        self.main_layout.addWidget(self.bar_widget)
-
-        self.setLayout(self.main_layout)
-        self.setWindowTitle('Préférences')
-
-        # Preventing the dialog window to be re-sized
-        # self.setFixedSize(self.size())
-
-        self.exec_()
-
-    def setIPList(self, ip_list):
-        self.ip_list = ip_list # Not enough
-
-    def setBarList(self, bar_list):
-        self.bar_list = bar_list
-
-    def receive_connection_info(self, val):
-        self.parameters["IP"] = val[0]
-        self.parameters["Host"] = val[1]  # WHat?
-        self.bar_list = ["zqedZQERFT5", "<FSFQSDFG", "qzsefrdtgfy"]
-        self.bar_widget.hide()
-        self.bar_widget = BarWidget(self, self.bar_list)
-        self.main_layout.addWidget(self.bar_widget)
-
-    def receive_bar_info(self, val):
-        self.parameters["Bar"] = val
-        self.c.emitParameters.emit(self.parameters)
-        self.close()
+		# Initializing the UI
+		self.__initUI()
 
 
-def receive_preferences(val):
-    print(val)
+	def __initUI(self):
+		"""Method creating the UI for this window."""
+
+		# Setting title
+		self.setWindowTitle("Préférences")
+
+		# Creating main layout
+		main_layout = QVBoxLayout()
+		
+		# Creating the top widget
+		self.pwd_widget = PwdWidget(self)
+		main_layout.addWidget(self.pwd_widget)
+
+		# Creating the bottom widget
+		self.preferences_widget = PreferencesWidget()
+		self.preferences_widget.setEnabled(False)
+
+		main_layout.addWidget(self.preferences_widget)
+
+		# Setting the main layout
+		self.setLayout(main_layout)
+
+	def enableBottomWidget(self):
+		self.preferences_widget.setEnabled(True)
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    cd = PreferencesDialog([])
+class PwdWidget(QWidget):
+	"""Class defining a widget containing the fields necessary for the passsword verification"""
+
+	def __init__(self,parent):
+		"""Constructor."""
+		QWidget.__init__(self)
+
+		self.ip = ""
+
+		self.__initUI(parent)
+
+	def __initUI(self,parent):
+		"""Method used to build the UI of the widget."""
+
+		frame = QFrame(self)
+		frame.setFrameShape(QFrame.StyledPanel)
+		frame.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+		main_layout = QFormLayout()
+
+		pwd_label= QLabel("Mot de passe :")
+		self.pwd_le = QLineEdit()
+
+		main_layout.addRow(pwd_label, self.pwd_le)
+
+		button = QPushButton("Vérification")
+		
+		button.clicked.connect(lambda: self.pwdCheck(parent))
+
+		main_layout.addRow(button)
+
+		frame.setLayout(main_layout)
+
+		layout = QHBoxLayout()
+		layout.addWidget(frame)
+		self.setLayout(layout)
+
+	def pwdCheck(self,parent):
+		"""Check password from password.txt"""
+		with open("password.txt","r") as f:
+			password = f.readline()
+			if password == self.pwd_le.text():
+				parent.enableBottomWidget()
+
+class PreferencesWidget(QWidget):
+	def __init__(self):
+		"""Constructor."""
+		QWidget.__init__(self)
+
+		self.ip = ""
+
+		self.__initUI()
+
+	def __initUI(self):
+		"""Method used to build the UI of the widget."""
+		self.background_color = ""
+		self.font_color = ""
+		with open("style.qss","r") as f:
+			lines = f.readlines()
+			
+			self.background_color = lines[10][23:-2:]
+			self.font_color = lines[9][12:-2:]
+			self.font_line = lines[17]
+			
+			if "bold" in self.font_line:
+				self.current_fontSize = self.font_line.split(":")[1].split(" ")[2].split("pt")[0]
+				self.current_font = self.font_line.split(":")[1].split(" ")[3].split(";")[0]
+				self.isBold = True
+			else:
+				self.current_fontSize = self.font_line.split(":")[1].split(" ")[1].split("pt")[0]
+				self.current_font = self.font_line.split(":")[1].split(" ")[2].split(";")[0]
+				self.isBold = False
+			
+			self.current_font = self.current_font.capitalize()
+			
+		frame = QFrame(self)
+		frame.setFrameShape(QFrame.StyledPanel)
+		frame.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+		main_layout = QFormLayout()
+
+		size_lb = QLabel("Taille de police :")
+
+		list_size = [str(i) for i in range(6,50)]
+		
+		self.size_combo = QComboBox(self)		
+		self.size_combo.addItems(list_size)
+
+		self.index = self.size_combo.findText(str(self.current_fontSize))
+		self.size_combo.setCurrentIndex(self.index)
+		
+		main_layout.addRow(size_lb, self.size_combo)
+
+		font_lb = QLabel("Police :")
+
+		f = open("fonts.txt", "r")
+		list_font = f.readlines()
+		f.close()
+		list_font =  [c.strip() for c in list_font]
+
+		self.font_combo = QComboBox(self)
+		self.font_combo.addItems(list_font)
+
+		self.index = self.font_combo.findText(str(self.current_font))
+		self.font_combo.setCurrentIndex(self.index)
+
+		main_layout.addRow(font_lb, self.font_combo)
+
+		bold_checkBox = QCheckBox("Bold", self)
+
+		if self.isBold:
+			bold_checkBox.setChecked(True)
+
+		main_layout.addRow(bold_checkBox)
+		
+		button_color_font = QPushButton("Color font", self)
+		button_color_font.clicked.connect(lambda : self.showDialog("font"))
+
+		button_color_background = QPushButton("Color background", self)
+		button_color_background.clicked.connect(lambda : self.showDialog("back"))
+
+		main_layout.addRow(button_color_font, button_color_background)
+
+		button = QPushButton("Appliquer")
+		button.clicked.connect(lambda: write(self, self.size_combo.currentText() ,self.font_combo.currentText(), bold_checkBox.isChecked()))
+
+		button_reset = QPushButton("Reset")
+		button_reset.clicked.connect(lambda :  self.reset())
+
+		main_layout.addRow(button,button_reset)
+
+		frame.setLayout(main_layout)
+		
+		layout = QHBoxLayout()
+		layout.addWidget(frame)
+		self.setLayout(layout)
+
+		def write(self, text_size, text_font, bool_bold):
+			"""Write style info to style.qss"""
+			print(bool_bold)
+			with open("stylebu.qss","r") as f:
+				lines = f.readlines()
+				if bool_bold:
+					lines[17] = "\tfont: bold {0}pt {1};\n".format(text_size,text_font)
+				else:
+					lines[17] = "\tfont: {0}pt {1};\n".format(text_size,text_font)
+				lines[9] = "	color: #{0};\n".format(self.font_color)
+				lines[10] = "	background-color: #{0};\n".format(self.background_color)
+				with open("style.qss","w") as f2:
+					for x in lines:
+						f2.write(x)
+
+	def reset(self):
+		"""Reset style.qss from stylebu.qss"""
+		with open("stylebu.qss","r") as f:
+			lines = f.readlines()
+			with open("style.qss","w") as f2:
+				for x in lines:
+					f2.write(x)
+
+						
+	def showDialog(self,info):
+		"""Show a dialog window to choose a color"""
+		col = QColorDialog.getColor()
+		if col.isValid():
+			if info == "font":
+				self.font_color = hex(col.rgb())[2::]
+			elif info == "back":
+				self.background_color = hex(col.rgb())[2::]
+			
+##			with open("style.qss","r") as f:
+##				lines = f.readlines()
+##				if info == "font":
+##					lines[9] = "	color: #{0};\n".format(hex(col.rgb())[2::])
+##				elif info == "back":
+##					lines[10] = "	background-color: #{0};\n".format(hex(col.rgb())[2::])
+##			with open("style.qss","w") as f:
+##				for x in lines:
+##					f.write(x)

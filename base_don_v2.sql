@@ -7,27 +7,29 @@ CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, drink INTEGER, room 
 -- Filling the tables --
 -- Creating drinks --
   -- By drink - 6 / box --
-INSERT INTO drinks(name, container_size, threshold, by_bottle, is_champagne) VALUES('Cordeliers', 42, 42, 1, 1);
-INSERT INTO drinks(name, container_size, threshold, by_bottle, is_champagne) VALUES('Cordeliers Rosé', 42, 42, 1, 1);
-INSERT INTO drinks(name, container_size, threshold, by_bottle, is_champagne) VALUES('Cordeliers Vintage', 42, 42, 1, 1);
+INSERT INTO drinks(name, container_size, threshold, by_bottle, is_champagne) VALUES('Prosecco', 42, 42, 1, 1);
+INSERT INTO drinks(name, container_size, threshold, by_bottle, is_champagne) VALUES('Jacquart Brut', 42, 42, 1, 1);
   -- Can sell Magnum = double bottle --
-INSERT INTO drinks(name, container_size, threshold, by_bottle) VALUES('Jacquart Brut', 42, 84, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Jacquart Magnum', 42, 84, 1);
   -- By bottle - 6 / box --
-INSERT INTO drinks(name, container_size, threshold) VALUES('Jacquart Rosé', 6, 6);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Prosecco', 6, 6, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Jacquart Rosé', 6, 6, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Jacquart Brut', 6, 6, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Moët&Chandon', 6, 6, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Ruinard', 6, 6, 1);
   -- By bottle - bottle / bottle - on demand --
-INSERT INTO drinks(name, container_size, threshold) VALUES('Moët & Chandon', 1, 0);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Deutz Brut', 1, 0);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Veuve Clicquot', 1, 0);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Ruinart Brut', 1, 0);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Dom Perignon', 1, 0);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Prosecco', 1, 0, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Jacquart Rosé', 1, 0, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Jacquart Brut', 1, 0, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Moët&Chandon', 1, 0, 1);
+INSERT INTO drinks(name, container_size, threshold, is_champagne) VALUES('Ruinard', 1, 0, 1);
   -- Cocktail by drink --
-INSERT INTO drinks(name, container_size, threshold) VALUES('Etincelle', 17, 17);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Euréka', 16, 16);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Atome', 12, 12);
-INSERT INTO drinks(name, container_size, threshold) VALUES('Eclair', 20, 20);
+INSERT INTO drinks(name, container_size, threshold) VALUES('Gondola azurra', 17, 17);
+INSERT INTO drinks(name, container_size, threshold) VALUES('Mexico', 17, 17);
+INSERT INTO drinks(name, container_size, threshold) VALUES('Lamdaba', 17, 17);
+INSERT INTO drinks(name, container_size, threshold) VALUES('Ming', 17, 17);
 -- Creating food --
 INSERT INTO food(name) VALUES ('Tapas');
-INSERT INTO food(name) VALUES ('Tapas pas bon');
 -- Creating rooms --
 INSERT INTO rooms(name, ip, connected, is_bar) VALUES('chine', '', 0, 1)
 INSERT INTO rooms(name, ip, connected, is_bar) VALUES('venise', '', 0, 1)
@@ -38,55 +40,41 @@ INSERT INTO rooms(name, ip, connected) VALUES('reserve', '', 0);
 INSERT INTO rooms(name, ip, connected) VALUES('cdf', '', 0)
 INSERT INTO rooms(name, ip, connected) VALUES('restal', '', 0)
 -- Filling initial stocks --
--- Tesla --
+-- Chine --
 INSERT INTO stocks(room, drink, quantity) VALUES(1, 1, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(1, 2, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(1, 3, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(1, 4, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(1, 3, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(1, 5, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(1, 6, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(1, 11, 51);
-INSERT INTO stocks(room, drink, quantity) VALUES(1, 13, 36);
-INSERT INTO stocks(room, drink, quantity) VALUES(1, 14, 60);
--- Edison --
-INSERT INTO stocks(room, drink, quantity) VALUES(2, 1, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(1, 7, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(1, 17, 17);
+-- Venise --
 INSERT INTO stocks(room, drink, quantity) VALUES(2, 2, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(2, 4, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(2, 3, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(2, 4, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(2, 5, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(2, 7, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(2, 8, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(2, 9, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(2, 11, 51);
-INSERT INTO stocks(room, drink, quantity) VALUES(2, 13, 36);
-INSERT INTO stocks(room, drink, quantity) VALUES(2, 14, 60);
--- Eiffel --
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 1, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 3, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 4, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(2, 14, 17);
+-- Rio --
+INSERT INTO stocks(room, drink, quantity) VALUES(3, 2, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(3, 3, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(3, 4, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(3, 5, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 6, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(3, 7, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(3, 8, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 9, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 11, 51);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 12, 48);
-INSERT INTO stocks(room, drink, quantity) VALUES(3, 14, 60);
--- Vinci --
-INSERT INTO stocks(room, drink, quantity) VALUES(4, 1, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(3, 16, 17);
+-- Mexico --
 INSERT INTO stocks(room, drink, quantity) VALUES(4, 2, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(4, 4, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(4, 3, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(4, 4, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(4, 5, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(4, 7, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(4, 8, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(4, 12, 48);
-INSERT INTO stocks(room, drink, quantity) VALUES(4, 13, 36);
-INSERT INTO stocks(room, drink, quantity) VALUES(4, 14, 60);
--- K'Ve --
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 1, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(4, 14, 17);
+-- K'Ve -
 INSERT INTO stocks(room, drink, quantity) VALUES(5, 2, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 3, 168);
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 4, 168);
+INSERT INTO stocks(room, drink, quantity) VALUES(5, 3, 6);
+INSERT INTO stocks(room, drink, quantity) VALUES(5, 4, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(5, 5, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 6, 6);
 INSERT INTO stocks(room, drink, quantity) VALUES(5, 7, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 8, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 9, 6);
-INSERT INTO stocks(room, drink, quantity) VALUES(5, 10, 0);
+INSERT INTO stocks(room, drink, quantity) VALUES(5, 17, 17);

@@ -167,7 +167,7 @@ class Window(QMainWindow):
         if location in [Locations.BAR, Locations.RESERVE]:  # To be modified
             self.orders_panel = OrdersPanel(location)
             self.orders_panel.cancel_order.connect(self.cancel_order)
-            layout.addWidget(self.orders_panel, stretch = 0)
+            layout.addWidget(self.orders_panel, stretch = 1)
 
         # Adding the main widget
         if location is Locations.RESERVE:
@@ -180,7 +180,7 @@ class Window(QMainWindow):
 
             from clientWidget import ClientWidget
             self.main_widget = ClientWidget()
-            layout.addWidget(self.main_widget, stretch = 1)
+            layout.addWidget(self.main_widget, stretch = 0)
 
         elif location is Locations.RESTAL:
 
@@ -193,7 +193,7 @@ class Window(QMainWindow):
             from cdfWidget import cdfWidget
             self.main_widget = cdfWidget()
             self.__app.send_champagne_cdf.connect(self.main_widget.setValues)
-            layout.addWidget(self.main_widget, stretch = 3)
+            layout.addWidget(self.main_widget, stretch = 2)
             #self.cdfWidget.setValues.connect
 
         else:  # If place is CDF or Unknown
@@ -201,7 +201,7 @@ class Window(QMainWindow):
 
         # Adding the right panel (chat) for everyone
         self.chat_panel = ChatPanel()
-        layout.addWidget(self.chat_panel, stretch = 2)
+        layout.addWidget(self.chat_panel, stretch = 1)
 
         # Setting layout on the widget
         widget.setLayout(layout)
@@ -359,8 +359,9 @@ class Window(QMainWindow):
                 self.__drinks[k] = d
             for k, n in drinks.items():
                 button = self.main_widget.buttons_dict[k]
-                button.setText(k + '\n' + n)
-
+                # button.setText(k + '\n' + n)
+                button.setText(n)
+				
                 # Setting the buttons color
                 if not is_restal:
                     color = "red"
